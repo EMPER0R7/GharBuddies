@@ -3,7 +3,7 @@ import React from 'react'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import homescreen from '../../src/screen/Homescreen.jsx';
+import Homescreen from '../../src/screen/Homescreen.jsx';
 import LoginScreen from '../../src/screen/LoginScreen.jsx';
 
 
@@ -14,7 +14,7 @@ const App = () => {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={homescreen} />
+      <Stack.Screen name="Home" component={Homescreen} />
       <Stack.Screen name="LOGIN" component={LoginScreen} />
       <Stack.Screen name="SIGNUP" component={LoginScreen} />
       </Stack.Navigator>

@@ -4,10 +4,15 @@ import colors, { colours } from '../utils/colours.js'
 import { fonts } from "../utils/fonts";
 
 
+
 import { useNavigation } from "@react-navigation/native";
 
 
 const homescreen = () => {
+    // const [fontsLoaded] = useFonts({
+    //     Poppins_400Regular,
+    //     Poppins_700Bold,
+    //   });
     const navigation = useNavigation();
 
     const handleLogin = () => {
@@ -19,7 +24,8 @@ const homescreen = () => {
   return (
     <View>
       <Image source={require('../../assets/images/image.png')} style={styles.logo} />
-      <Text style={styles.text}>Welcome to the GharBuddies</Text>
+      <Text style={styles.text}>Welcome to  GharBuddies</Text>
+      <Text style={styles.suntext}>Continue With us</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[
@@ -55,12 +61,19 @@ logo:{
     marginLeft:85
 },
 text:{
-    fontSize:36,
+    fontSize:25,
     fontFamily:fonts.Bold,
     textAlign: 'center',
-    paddingTop: 10,
+    paddingTop: 50,
+    fontStyle:"italic",
+    fontWeight:"bold",
     
 
+},
+suntext:{
+    textAlign:'center',
+    marginTop:50,
+    
 },
 buttonContainer: {
     marginTop: 20,
