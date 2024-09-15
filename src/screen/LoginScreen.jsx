@@ -8,9 +8,13 @@ import { TouchableOpacity } from 'react-native'
 import { colours } from '../utils/colours'
 import { fonts } from '../utils/fonts'
 import { useNavigation } from "@react-navigation/native";
+import { auth } from './firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const LoginScreen = () => {
     const navigation = useNavigation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [secureEntery, setSecureEntery] = useState(true);
   
     const handleGoBack = () => {
@@ -19,6 +23,21 @@ const LoginScreen = () => {
     const handleSignup = () => {
       navigation.navigate("SIGNUP");
     };
+    const handleLogin = () => {
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // Successful login
+            const user = userCredential.user;
+            console.log("Logged in as:", user.email);
+            // Navigate to home or dashboard
+            navigation.navigate('Dashboard'); // Replace 'Home' with the actual screen name
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            console.error("Login failed:", errorMessage);
+            // Handle error, show alert, etc.
+          });
+      };
 
   return (
     <View style={styles.container}>
@@ -43,6 +62,8 @@ const LoginScreen = () => {
             placeholder="Enter your email"
             placeholderTextColor={colours.secondary}
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -52,6 +73,8 @@ const LoginScreen = () => {
             placeholder="Enter your password"
             placeholderTextColor={colours.secondary}
             secureTextEntry={secureEntery}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity
             onPress={() => {
@@ -64,7 +87,7 @@ const LoginScreen = () => {
         <TouchableOpacity>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.loginButtonWrapper}>
+        <TouchableOpacity style={styles.loginButtonWrapper} onPress={handleLogin}>
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
         <Text style={styles.continueText}>or continue with</Text>

@@ -1,16 +1,19 @@
-import { StyleSheet, Text, View,Image, TextInput, } from 'react-native'
-import React from 'react'
-import  { useState } from 'react';
+import { StyleSheet, Text, View, Image, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import { colours } from '../utils/colours';
+import { fonts } from '../utils/fonts';
+import { useNavigation } from '@react-navigation/native';
+import { auth } from './firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
-import { Ionicons } from '@expo/vector-icons'
-import { SimpleLineIcons} from '@expo/vector-icons'
-import { TouchableOpacity } from 'react-native'
-import { colours } from '../utils/colours'
-import { fonts } from '../utils/fonts'
-import { useNavigation } from "@react-navigation/native";
+
 
 const SignupScreen = () => {
     const navigation = useNavigation();
+    const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [secureEntery, setSecureEntery] = useState(true);
 
   const handleGoBack = () => {
@@ -19,6 +22,21 @@ const SignupScreen = () => {
 
   const handleLogin = () => {
     navigation.navigate("LOGIN");
+  };
+  const handleSignup = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        
+        const user = userCredential.user;
+        console.log("Signed up as:", user.email);
+        // Navigate to home or dashboard
+        navigation.navigate('Dashboard'); // Replace 'Home' with the actual screen name
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        console.error("Signup failed:", errorMessage);
+        // Handle error, show alert, etc.
+      });
   };
 
   return (
@@ -43,6 +61,8 @@ const SignupScreen = () => {
             placeholder="Enter your email"
             placeholderTextColor={colours.secondary}
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -51,6 +71,8 @@ const SignupScreen = () => {
             style={styles.textInput}
             placeholder="Enter your password"
             placeholderTextColor={colours.secondary}
+            value={password}
+            onChangeText={setPassword}
             secureTextEntry={secureEntery}
           />
           <TouchableOpacity
@@ -78,7 +100,7 @@ const SignupScreen = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.loginButtonWrapper}>
+        <TouchableOpacity style={styles.loginButtonWrapper} onPress={handleSignup}>
           <Text style={styles.loginText}>Sign up</Text>
         </TouchableOpacity>
         <Text style={styles.continueText}>or continue with</Text>
