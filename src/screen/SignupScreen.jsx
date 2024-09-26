@@ -7,11 +7,17 @@ import { fonts } from '../utils/fonts';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from './firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {db} from './firebase'
+import { doc, setDoc } from "firebase/firestore";
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
 
 
 
 const SignupScreen = () => {
     const navigation = useNavigation();
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureEntery, setSecureEntery] = useState(true);
@@ -19,23 +25,45 @@ const SignupScreen = () => {
   const handleGoBack = () => {
     navigation.goBack();
   };
+  const handleGoogleSignIn = async () => {
+    try {
+      // Sign in with Google
+      await GoogleSignin.hasPlayServices();
+      const { idToken } = await GoogleSignin.signIn();
+  
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+  
+      // Sign-in the user with the credential
+      return auth().signInWithCredential(googleCredential);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   const handleLogin = () => {
     navigation.navigate("LOGIN");
   };
   const handleSignup = () => {
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        
+      .then(async (userCredential) => {
         const user = userCredential.user;
         console.log("Signed up as:", user.email);
-        // Navigate to home or dashboard
-        navigation.navigate('Dashboard'); // Replace 'Home' with the actual screen name
+
+        // Save user data in Firestore
+        await setDoc(doc(db, "Users", user.uid), {
+          name: name,
+          email: email,
+          phone: phone,
+          createdAt: new Date(),
+        });
+
+      
+        navigation.navigate('Dashboard');
       })
       .catch((error) => {
-        const errorMessage = error.message;
-        console.error("Signup failed:", errorMessage);
-        // Handle error, show alert, etc.
+        console.error("Signup failed:", error.message);
       });
   };
 
@@ -54,6 +82,17 @@ const SignupScreen = () => {
       </View>
       {/* form  */}
       <View style={styles.formContainer}>
+      <View style={styles.inputContainer}>
+          <Ionicons name={"person-outline"} size={30} color={colours.secondary} />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Enter your name"
+            placeholderTextColor={colours.secondary}
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
+
         <View style={styles.inputContainer}>
           <Ionicons name={"mail-outline"} size={30} color={colours.secondary} />
           <TextInput
@@ -97,6 +136,8 @@ const SignupScreen = () => {
             placeholderTextColor={colours.secondary}
             secureTextEntry={secureEntery}
             keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
           />
         </View>
 
@@ -104,7 +145,7 @@ const SignupScreen = () => {
           <Text style={styles.loginText}>Sign up</Text>
         </TouchableOpacity>
         <Text style={styles.continueText}>or continue with</Text>
-        <TouchableOpacity style={styles.googleButtonContainer}>
+        <TouchableOpacity style={styles.googleButtonContainer} onPress={handleGoogleSignIn}>
           <Image
             source={require("../../assets/images/gg.png")}
             style={styles.googleImage}
